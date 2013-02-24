@@ -1,0 +1,12 @@
+--- Pin Usage ---
+
+LED		-	PortB Pin2
+
+RTTY Space	-	PortC Pin0
+RTTY Mark	-	PortC Pin1
+RTTY Enable	-	PortC Pin2
+
+GPS TX		-	UART0 PortD Pin0
+GPS RX		-	UART0 PortD Pin1
+
+OneWire Sensors	-	PortC Pin3
