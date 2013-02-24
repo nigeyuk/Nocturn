@@ -1,5 +1,5 @@
 
-/* Project Swift - High altitude balloon flight software                 */
+/* Project Nocturn - High altitude balloon flight software               */
 /*=======================================================================*/
 /* Copyright 2010-2012 Philip Heron <phil@sanslogic.co.uk>               */
 /*                                                                       */
@@ -25,17 +25,17 @@
 #include "rtty.h"
 
 /* MARK = Upper tone, Idle, bit  */
-#define TXSPACE  (1 << 0) /* PA0 */
-#define TXMARK   (1 << 1) /* PA1 */
-#define TXENABLE (1 << 2) /* PA2 */
+#define TXSPACE  (1 << 0) /* PC0 */
+#define TXMARK   (1 << 1) /* PC1 */
+#define TXENABLE (1 << 2) /* PC2 */
 
-#define TXBIT(b) PORTA = (PORTA & ~(TXMARK | TXSPACE)) | ((b) ? TXMARK : TXSPACE)
+#define TXBIT(b) PORTC = (PORTC & ~(TXMARK | TXSPACE)) | ((b) ? TXMARK : 0) | TXSPACE
 
 volatile static uint8_t  txpgm = 0;
 volatile static uint8_t *txbuf = 0;
 volatile static uint16_t txlen = 0;
 
-ISR(TIMER0_COMPA_vect)
+ISR(TIMER1_COMPA_vect)
 {
 	/* The currently transmitting byte, including framing */
 	static uint8_t byte = 0x00;
@@ -63,22 +63,22 @@ ISR(TIMER0_COMPA_vect)
 
 void rtx_enable(char en)
 {
-	if(en) PORTA |= TXENABLE;
-	else PORTA &= ~TXENABLE;
+	if(en) PORTC |= TXENABLE;
+	else PORTC &= ~TXENABLE;
 }
 
 void rtx_init(void)
 {
 	/* RTTY is driven by TIMER0 in CTC mode */
-	TCCR0A = _BV(WGM01); /* Mode 2, CTC */
-	TCCR0B = _BV(CS02) | _BV(CS00); /* prescaler 1024 */
-	OCR0A = F_CPU / 1024 / RTTY_BAUD - 1;
-	TIMSK0 = _BV(OCIE0A); /* Enable interrupt */
+	TCCR1A = 0; /* Mode 2, CTC */
+	TCCR1B = _BV(WGM12) | _BV(CS12) | _BV(CS10); /* prescaler 1024 */
+	OCR1A = F_CPU / 1024 / RTTY_BAUD - 1;
+	TIMSK1 = _BV(OCIE1A); /* Enable interrupt */
 	
-	/* We use Port B pins 1 and 2 */
+	/* We use Port c pins 1 and 2 */
 	TXBIT(1);
 	rtx_enable(0);
-	DDRA |= TXMARK | TXSPACE | TXENABLE;
+	DDRC |= TXMARK | TXSPACE | TXENABLE;
 }
 
 void inline rtx_wait(void)

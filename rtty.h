@@ -1,7 +1,7 @@
 
-/* Project Swift - High altitude balloon flight software                 */
+/* Project Nocturn - High altitude balloon flight software               */
 /*=======================================================================*/
-/* Copyright 2010-2012 Philip Heron <phil@sanslogic.co.uk>               */
+/* Copyright 2012-2013 Philip Heron <phil@sanslogic.co.uk>               */
 /*                                                                       */
 /* This program is free software: you can redistribute it and/or modify  */
 /* it under the terms of the GNU General Public License as published by  */

@@ -1,6 +1,6 @@
-/* Project Swift - High altitude balloon flight software                 */
+/* Project Nocturn - High altitude balloon flight software               */
 /*=======================================================================*/
-/* Copyright 2010-2012 Nigel Smart <nigel@projectswift.co.uk>            */
+/* Copyright 2012-2013 Nigel Smart <nigel@projectswift.co.uk>            */
 /* And Philip Heron <phil@sanslogic.co.uk>                               */
 /* Additional Help from Jon Sowman & Adam Greig of Cambridge University  */
 /* Spaceflight (www.cusf.co.uk)                                          */

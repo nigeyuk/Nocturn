@@ -1,6 +1,6 @@
-/* Project Swift - High altitude balloon flight software                 */
+/* Project Nocturn - High altitude balloon flight software               */
 /*=======================================================================*/
-/* Copyright 2010-2012 Nigel Smart <nigel@projectswift.co.uk>            */
+/* Copyright 2012-2013 Nigel Smart <nigel@projectswift.co.uk>            */
 /* And Philip Heron <phil@sanslogic.co.uk>                               */
 /* Additional Help from Jon Sowman & Adam Greig of Cambridge University  */
 /* Spaceflight (www.cusf.co.uk)                                          */
@@ -29,14 +29,14 @@
 
 static uint8_t _gps_get_byte(void)
 {
-	while(!(UCSR1A & _BV(RXC1)));
-	return(UDR1);
+	while(!(UCSR0A & _BV(RXC0)));
+	return(UDR0);
 }
 
 static void _gps_send_byte(uint8_t b, uint8_t *ck_a, uint8_t *ck_b)
 {
-	while(!(UCSR1A & _BV(UDRE1)));
-	UDR1 = b;
+	while(!(UCSR0A & _BV(UDRE0)));
+	UDR0 = b;
 	if(ck_a && ck_b) *ck_b += *ck_a += b;
 }
 
@@ -111,14 +111,14 @@ void _gps_setup_port(void)
 void gps_setup(void)
 {
 	/* Do UART1 initialisation, 9600 baud */
-	UBRR1H = (F_CPU / 16 / 9600 - 1) >> 8;
-	UBRR1L = F_CPU / 16 / 9600 - 1;
+	UBRR0H = (F_CPU / 16 / 9600 - 1) >> 8;
+	UBRR0L = F_CPU / 16 / 9600 - 1;
 	
 	/* Enable RX and TX */
-	UCSR1B = _BV(RXEN1) | _BV(TXEN1);
+	UCSR0B = _BV(RXEN0) | _BV(TXEN0);
 	
 	/* 8-bit, no parity and 1 stop bit */
-	UCSR1C = _BV(UCSZ11) | _BV(UCSZ10);
+	UCSR0C = _BV(UCSZ01) | _BV(UCSZ00);
 	
 	/* Configure the GPS module */
 	_gps_setup_port();
