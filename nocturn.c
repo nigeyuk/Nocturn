@@ -46,7 +46,7 @@ uint16_t crccat(char *msg)
 int main(void)
 {
 	uint32_t count = 0;
-	int32_t lat, lon, alt, temp;
+	int32_t lat, lon, alt, temp, tempe;
 	uint8_t hour, minute, second;
 	char msg[100];
 	uint8_t i, r;
@@ -109,15 +109,18 @@ int main(void)
 		/* Read the temperature from sensor 0 */
 		ds_read_temperature(&temp, id[0]);
 		
+		ds_read_temperature(&tempe, id[1]);
+		
 		rtx_wait();
 		
-		snprintf(msg, 100, "$$%s,%li,%02i:%02i:%02i,%s%li.%05li,%s%li.%05li,%li,%li.%01li,%c",
+		snprintf(msg, 100, "$$%s,%li,%02i:%02i:%02i,%s%li.%05li,%s%li.%05li,%li,%li.%01li,%li.%01li,%c",
 			RTTY_CALLSIGN, count++,
 			hour, minute, second,
 			(lat < 0 ? "-" : ""), labs(lat) / 10000000, labs(lat) % 10000000 / 100,
 			(lon < 0 ? "-" : ""), labs(lon) / 10000000, labs(lon) % 10000000 / 100,
 			alt / 1000,
 			temp / 10000, labs(temp) / 1000 % 10,
+			tempe / 10000, labs(tempe) / 1000 % 10,
 			(geofence_uk(lat, lon) ? '1' : '0'));
 		crccat(msg + 2);
 		rtx_string(msg);
