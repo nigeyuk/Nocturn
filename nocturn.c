@@ -54,14 +54,19 @@ int main(void)
 	/* Set the LED pin for output */
 	DDRB |= _BV(DDB2);
 	
+	/* Turn on the LED (Debug only disbale for flight) */
+	LEDBIT(1);
+	
 	rtx_init();
+	
+	sei();
+
 	gps_setup();	
 	
 	/* Enable the radio and let it settle */
 	rtx_enable(1);
-	_delay_ms(1000);
+	_delay_ms(2000);
 	
-	sei();
 	
 	rtx_string_P(PSTR(RTTY_CALLSIGN " starting up\n"));	
 	rtx_string_P(PSTR("Scanning 1-wire bus:\n"));
@@ -92,18 +97,34 @@ int main(void)
 	
 	while(1)
 	{
-		if(!gps_get_pos(&lat, &lon, &alt))
+
+		/*Set the GPS navmode every 10 strings */
+		if(count % 10 == 0)
 		{
-			rtx_string_P(PSTR("$$" RTTY_CALLSIGN ",No or invalid GPS response\n"));
-			continue;
-		}
-		
-		if(!gps_get_time(&hour, &minute, &second))
-		{
-			rtx_string_P(PSTR("$$" RTTY_CALLSIGN ",No or invalid GPS response\n"));
-			continue;
+
+			/*mode 6 is "Airbourne with <1g Acceleration */
+			if(gps_set_nav(6) != GPS_OK)
+			{
+			rtx_string_P(PSTR("$$" RTTY_CALLSIGN ",Error setting GPS navmode\n"));
+
+			}
+
 		}
 
+			/*Get the latitude and longitude */
+			if(gps_get_pos(&lat, &lon, &alt) != GPS_OK)
+		{
+			rtx_string_P(PSTR("$$" RTTY_CALLSIGN ",No or invalid GPS response\n"));
+			lat = lon = alt = 0;
+		}
+
+			/*Get the GPS time*/
+			if(gps_get_time(&hour, &minute, &second) != GPS_OK)
+		{
+			rtx_string_P(PSTR("$$" RTTY_CALLSIGN ",No or invalid GPS response\n"));
+			hour = minute = second = 0;
+
+		}
 
 
 		/* Read the temperature from sensor 0 */
@@ -113,7 +134,7 @@ int main(void)
 		
 		rtx_wait();
 		
-		snprintf(msg, 100, "$$%s,%li,%02i:%02i:%02i,%s%li.%05li,%s%li.%05li,%li,%li.%01li,%li.%01li,%c",
+		snprintf(msg, 100, "$$$$%s,%li,%02i:%02i:%02i,%s%li.%05li,%s%li.%05li,%li,%li.%01li,%li.%01li,%c",
 			RTTY_CALLSIGN, count++,
 			hour, minute, second,
 			(lat < 0 ? "-" : ""), labs(lat) / 10000000, labs(lat) % 10000000 / 100,
@@ -122,7 +143,7 @@ int main(void)
 			temp / 10000, labs(temp) / 1000 % 10,
 			tempe / 10000, labs(tempe) / 1000 % 10,
 			(geofence_uk(lat, lon) ? '1' : '0'));
-		crccat(msg + 2);
+		crccat(msg + 4);
 		rtx_string(msg);
 	}
 }
